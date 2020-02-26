@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/mux"
 )
@@ -34,10 +35,22 @@ func createHero(w http.ResponseWriter, r *http.Request) {
 	var newHero hero
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Fprintf(w, "Gebe Daten eines neuen Helden ein.")
+		fmt.Fprintf(w, "Type in the Data of the new Hero")
 	}
 
 	json.Unmarshal(reqBody, &newHero)
+
+	_, parseErr := strconv.Atoi(newHero.ID)
+	if parseErr != nil {
+		fmt.Fprintf(w, "Hero ID is invalid. ")
+		return
+	}
+
+	idint, err := strconv.Atoi(newHero.ID)
+	if idint > 0 {
+		fmt.Fprintf(w, "Hero ID is valid. ")
+	}
+
 	heroes = append(heroes, newHero)
 	w.WriteHeader(http.StatusCreated)
 
@@ -64,7 +77,7 @@ func updateHero(w http.ResponseWriter, r *http.Request) {
 
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
-		fmt.Fprintf(w, "Geb die neuen Daten ein")
+		fmt.Fprintf(w, "Type in new Data")
 	}
 	json.Unmarshal(reqBody, &updatedHero)
 
