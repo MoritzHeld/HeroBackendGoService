@@ -47,8 +47,9 @@ func createHero(w http.ResponseWriter, r *http.Request) {
 	}
 
 	idint, err := strconv.Atoi(newHero.ID)
-	if idint > 0 {
-		fmt.Fprintf(w, "Hero ID is valid. ")
+	if idint < 0 {
+		fmt.Fprintf(w, "Hero ID is invalid, below zero. ")
+		return
 	}
 
 	heroes = append(heroes, newHero)
