@@ -17,7 +17,7 @@ func homeLink(w http.ResponseWriter, r *http.Request) {
 
 type hero struct {
 	ID          string `json:"ID"`
-	Title       string `json:"Title"`
+	Name        string `json:"Name"`
 	Description string `json:"Description"`
 }
 
@@ -26,12 +26,23 @@ type allHeroes []hero
 var heroes = allHeroes{
 	{
 		ID:          "1",
-		Title:       "Held123",
-		Description: "Heldenhafter Held 12345",
+		Name:        "Moritz",
+		Description: "held1",
+	},
+	{
+		ID:          "2",
+		Name:        "Fabian",
+		Description: "held2",
+	},
+	{
+		ID:          "3",
+		Name:        "Sven",
+		Description: "held3",
 	},
 }
 
 func createHero(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	var newHero hero
 	reqBody, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -59,6 +70,7 @@ func createHero(w http.ResponseWriter, r *http.Request) {
 }
 
 func getOneHero(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	eventID := mux.Vars(r)["id"]
 
 	for _, singleHero := range heroes {
@@ -69,10 +81,12 @@ func getOneHero(w http.ResponseWriter, r *http.Request) {
 }
 
 func getAllHeroes(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	json.NewEncoder(w).Encode(heroes)
 }
 
 func updateHero(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	eventID := mux.Vars(r)["id"]
 	var updatedHero hero
 
@@ -84,7 +98,7 @@ func updateHero(w http.ResponseWriter, r *http.Request) {
 
 	for i, singleHero := range heroes {
 		if singleHero.ID == eventID {
-			singleHero.Title = updatedHero.Title
+			singleHero.Name = updatedHero.Name
 			singleHero.Description = updatedHero.Description
 			heroes = append(heroes[:i], singleHero)
 			json.NewEncoder(w).Encode(singleHero)
@@ -93,6 +107,7 @@ func updateHero(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteHero(w http.ResponseWriter, r *http.Request) {
+	enableCors(&w)
 	HeroID := mux.Vars(r)["id"]
 
 	for i, singleHero := range heroes {
@@ -101,6 +116,10 @@ func deleteHero(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprintf(w, "The Hero with ID %v has been deleted successfully", HeroID)
 		}
 	}
+}
+
+func enableCors(w *http.ResponseWriter) {
+	(*w).Header().Set("Access-Control-Allow-Origin", "*")
 }
 
 func main() {
