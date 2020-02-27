@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 )
 
@@ -86,7 +87,7 @@ func getAllHeroes(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateHero(w http.ResponseWriter, r *http.Request) {
-	enableCors(&w)
+	//enableCors(&w)
 	eventID := mux.Vars(r)["id"]
 	var updatedHero hero
 
@@ -125,10 +126,14 @@ func enableCors(w *http.ResponseWriter) {
 func main() {
 	router := mux.NewRouter().StrictSlash(true)
 	router.HandleFunc("/", homeLink)
-	router.HandleFunc("/heroes", createHero).Methods("POST")
+	router.HandleFunc("/heroes", createHero).Methods("PUT")
 	router.HandleFunc("/heroes", getAllHeroes).Methods("GET")
 	router.HandleFunc("/heroes/{id}", getOneHero).Methods("GET")
-	router.HandleFunc("/heroes/{id}", updateHero).Methods("PATCH")
+	router.HandleFunc("/heroes/{id}", updateHero).Methods("POST")
 	router.HandleFunc("/heroes/{id}", deleteHero).Methods("DELETE")
-	log.Fatal(http.ListenAndServe(":8080", router))
+	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedHeaders([]string{"X-Requested-With"}),
+		handlers.AllowedMethods([]string{"GET", "HEAD", "POST", "PUT", "PATCH", "OPTIONS"}))(router)))
+
 }
