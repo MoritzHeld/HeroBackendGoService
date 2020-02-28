@@ -54,8 +54,14 @@ func createHero(w http.ResponseWriter, r *http.Request) {
 
 	_, parseErr := strconv.Atoi(newHero.ID)
 	if parseErr != nil {
-		fmt.Fprintf(w, "Hero ID is invalid. ")
-		return
+		var maxId int
+		for i := 0; i < len(heroes); {
+			idint, err := strconv.Atoi(heroes[i].ID)
+			if err == nil && idint > 0 && idint > maxId {
+				maxId = idint
+			}
+		}
+		newHero.ID = strconv.Itoa(maxId + 1)
 	}
 
 	idint, err := strconv.Atoi(newHero.ID)
@@ -88,7 +94,7 @@ func getAllHeroes(w http.ResponseWriter, r *http.Request) {
 
 func updateHero(w http.ResponseWriter, r *http.Request) {
 	//enableCors(&w)
-	eventID := mux.Vars(r)["id"]
+	heroID := mux.Vars(r)["id"]
 	var updatedHero hero
 
 	reqBody, err := ioutil.ReadAll(r.Body)
@@ -97,12 +103,11 @@ func updateHero(w http.ResponseWriter, r *http.Request) {
 	}
 	json.Unmarshal(reqBody, &updatedHero)
 
-	for i, singleHero := range heroes {
-		if singleHero.ID == eventID {
-			singleHero.Name = updatedHero.Name
-			singleHero.Description = updatedHero.Description
-			heroes = append(heroes[:i], singleHero)
-			json.NewEncoder(w).Encode(singleHero)
+	for i := range heroes {
+		if heroes[i].ID == heroID {
+			heroes[i].Name = updatedHero.Name
+			heroes[i].Description = updatedHero.Description
+			json.NewEncoder(w).Encode(heroes[i])
 		}
 	}
 }
