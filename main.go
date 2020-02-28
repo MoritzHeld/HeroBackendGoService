@@ -55,7 +55,7 @@ func createHero(w http.ResponseWriter, r *http.Request) {
 	_, parseErr := strconv.Atoi(newHero.ID)
 	if parseErr != nil {
 		var maxId int
-		for i := 0; i < len(heroes); {
+		for i := 0; i < len(heroes); i++ {
 			idint, err := strconv.Atoi(heroes[i].ID)
 			if err == nil && idint > 0 && idint > maxId {
 				maxId = idint
@@ -68,6 +68,10 @@ func createHero(w http.ResponseWriter, r *http.Request) {
 	if idint < 0 {
 		fmt.Fprintf(w, "Hero ID is invalid, below zero. ")
 		return
+	}
+
+	if newHero.Name == "" {
+		newHero.Name = "Name"
 	}
 
 	heroes = append(heroes, newHero)
